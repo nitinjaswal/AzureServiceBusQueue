@@ -34,6 +34,19 @@ The solution is designed to help developers understand how to integrate Azure Se
 - Lock duration ensures that a message is temporarily unavailable to other receivers while being processed. If not completed within the lock duration, the message becomes available to other receivers until the max delivery count is reached.
 - Topics: is like a pub sub model, where we can have multiple subscribers for a single topic, whereas in queue we can have only one subscriber(1-1)     
 
+## Peek Lock
+- Peek lock is a mode of receiving messages from a queue or subscription in Azure Service Bus. When a message is received in peek lock mode, it is not removed from the queue immediately. Instead, it is locked for a specified duration (lock duration) to allow the receiver to process the message without it being consumed by other receivers. If the message is successfully processed within the lock duration, it can be completed (removed from the queue). If not, the lock expires, and the message becomes available for other receivers to process.
+- Peek lock is useful for scenarios where you want to ensure that a message is processed only once and allows for retries in case of processing failures. It helps prevent message loss and ensures that messages are not lost if the receiver fails to process them within the lock duration.
+- Peek Lock is the default receive mode in Azure Service Bus. When a message is received, it is locked for a short period (lock duration, e.g., 30 seconds by default).
+- If you call CompleteAsync, the message is deleted from the queue.
+- If you do not call CompleteAsync (for example, due to an exception), the lock expires and the message becomes available for delivery again (retry).
+- If the message is not processed successfully after a certain number of attempts (max delivery count), it is moved to the dead-letter queue for further inspection.
+- **Note:** The lock duration is configurable, and you can set it according to your application's needs. The default lock duration is 30 seconds, but you can increase or decrease it based on your processing requirements.
+
+## Message duplication
+- Azure Service Bus handles message duplication using the MessageId property.
+- **MessageId**: Each message sent to a queue or topic can have a MessageId set by the sender. Azure Service Bus uses this ID to identify duplicate messages.
+
 
 **Summary:**  
 The dead-letter queue is a special sub-queue for messages that cannot be delivered or processed successfully, such as those that exceed their TTL or max delivery count.
